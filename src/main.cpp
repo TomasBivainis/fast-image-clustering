@@ -3,14 +3,40 @@
 #include <vector>
 #include <opencv2/opencv.hpp>
 
-class Helper {
+class Vec3 {
 public:
-    static void printPoint(std::vector<int> point) {
-        for(int i = 0; i < point.size(); i++) {
-            std::cout << point[i] << " ";
-        }
+    int x;
+    int y;
+    int z;
 
-        std::cout << std::endl;
+    Vec3() : x(0), y(0), z(0) {
+    }
+
+    Vec3(int x, int y, int z) : x(x), y(y), z(z) {
+    }
+
+    Vec3(cv::Vec3b vector) : x(vector[0]), y(vector[1]), z(vector[2]) {
+    }
+
+    int operator[](int i){
+        switch (i){
+            case 0:
+                return x;
+            case 1:
+                return y;
+            case 2:
+                return z;
+            default:
+                throw new std::runtime_error("Index out of bounds");
+        }
+    }
+
+    Vec3 operator+(const Vec3 &v) {
+        return Vec3(z + v.x, y + v.y, z + v.z);
+    }
+
+    void print() {
+        std::cout << x << " " << y << " " << z << std::endl;
     }
 };
 
@@ -47,15 +73,8 @@ public:
         return image;
     }
 
-    std::vector<int> getPoint(int row, int column) {
-        cv::Vec3b point = image.at<cv::Vec3b>(row, column);
-        std::vector<int> castedPoint(3);
-        
-        for(size_t i = 0; i < 3; i++) {
-            castedPoint[i] = static_cast<int>(point[i]);
-        }
-
-        return castedPoint; 
+    Vec3 getPoint(int row, int column) {
+        return Vec3(image.at<cv::Vec3b>(row, column));
     }
 };
 
@@ -71,7 +90,15 @@ int main(int argc, char *argv[]) {
 
     Image *image = new Image(filename);
 
-    Helper::printPoint((image -> getPoint(0, 0)));
+    Vec3 point1 = image -> getPoint(0, 0);
+    Vec3 point2 = image -> getPoint(0, 1);
+
+    point1.print();
+    point2.print();
+
+    point1 = point1 + point2;
+    
+    point1.print();
 
     cv::imshow("image", image -> getImage());
     cv::waitKey(0);
