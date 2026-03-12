@@ -5,20 +5,20 @@
 
 class Vec3 {
 public:
-    int x;
-    int y;
-    int z;
+    float x;
+    float y;
+    float z;
 
     Vec3() : x(0), y(0), z(0) {
     }
 
-    Vec3(int x, int y, int z) : x(x), y(y), z(z) {
+    Vec3(float x, float y, float z) : x(x), y(y), z(z) {
     }
 
-    Vec3(cv::Vec3b vector) : x(vector[0]), y(vector[1]), z(vector[2]) {
+    Vec3(cv::Vec3b vector) : x(static_cast<float>(vector[0])), y(static_cast<float>(vector[1])), z(static_cast<float>(vector[2])) {
     }
 
-    int operator[](int i){
+    float operator[](int i){
         switch (i){
             case 0:
                 return x;
@@ -35,24 +35,40 @@ public:
         return Vec3(x + v.x, y + v.y, z + v.z);
     }
 
+    void operator+=(const Vec3 &v) {
+        (*this) = Vec3(x + v.x, y + v.y, z + v.z);
+    }
+
     Vec3 operator-(const Vec3 &v) {
         return Vec3(x - v.x, y - v.y, z - v.z);
     }
 
-    Vec3 operator*(const float &c) {
-        return Vec3(static_cast<int>(static_cast<float>(x) * c), static_cast<int>(static_cast<float>(y) * c), static_cast<int>(static_cast<float>(z) * c));
+    void operator-=(const Vec3 &v) {
+        (*this) = Vec3(x - v.x, y - v.y, z - v.z);
     }
 
+    Vec3 operator*(const float &c) {
+        return Vec3(x * c, y * c, z * c);
+    }
+
+    void operator*=(const float &c) {
+        (*this) = Vec3(x * c, y * c, z * c);
+    }
+    
     Vec3 operator/(const float &c) {
-        return Vec3(static_cast<int>(static_cast<float>(x) / c), static_cast<int>(static_cast<float>(y) / c), static_cast<int>(static_cast<float>(z) / c));
+        return Vec3(x / c, y / c, z / c);
+    }
+
+    void operator/=(const float &c) {
+        (*this) = Vec3(x / c, y / c, z / c);
     }
 
     float length() {
-        return 
+        return std::sqrt(x * x + y * y + z * z);
     }
 
     Vec3 normalize() {
-
+        return (*this) / length();
     }
 
     void print() {
@@ -116,7 +132,7 @@ int main(int argc, char *argv[]) {
     point1.print();
     point2.print();
 
-    point1 = point1 + point2;
+    point1 += point2;
     
     point1.print();
 
@@ -127,6 +143,12 @@ int main(int argc, char *argv[]) {
     point1 = point1 * 10;
 
     point1.print();
+
+    point1 = point1.normalize();
+
+    point1.print();
+
+    std::cout << point1.length() << std::endl;
 
     std::cout << point1[0] << std::endl;
 
