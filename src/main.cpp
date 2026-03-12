@@ -32,7 +32,27 @@ public:
     }
 
     Vec3 operator+(const Vec3 &v) {
-        return Vec3(z + v.x, y + v.y, z + v.z);
+        return Vec3(x + v.x, y + v.y, z + v.z);
+    }
+
+    Vec3 operator-(const Vec3 &v) {
+        return Vec3(x - v.x, y - v.y, z - v.z);
+    }
+
+    Vec3 operator*(const float &c) {
+        return Vec3(static_cast<int>(static_cast<float>(x) * c), static_cast<int>(static_cast<float>(y) * c), static_cast<int>(static_cast<float>(z) * c));
+    }
+
+    Vec3 operator/(const float &c) {
+        return Vec3(static_cast<int>(static_cast<float>(x) / c), static_cast<int>(static_cast<float>(y) / c), static_cast<int>(static_cast<float>(z) / c));
+    }
+
+    float length() {
+        return 
+    }
+
+    Vec3 normalize() {
+
     }
 
     void print() {
@@ -99,6 +119,16 @@ int main(int argc, char *argv[]) {
     point1 = point1 + point2;
     
     point1.print();
+
+    point1 = point1 - point2;
+
+    point1.print();
+
+    point1 = point1 * 10;
+
+    point1.print();
+
+    std::cout << point1[0] << std::endl;
 
     cv::imshow("image", image -> getImage());
     cv::waitKey(0);
