@@ -63,12 +63,18 @@ public:
         (*this) = Vec3(x / c, y / c, z / c);
     }
 
-    float length() {
+    float length() const {
         return std::sqrt(x * x + y * y + z * z);
     }
 
-    Vec3 normalize() {
-        return (*this) / length();
+    Vec3 normalized() const {
+        float len = length();
+        return Vec3(x / len, y / len, z / len);
+    }
+
+    Vec3& normalize() {
+        (*this) /= length();
+        return *this;
     }
 
     void print() {
