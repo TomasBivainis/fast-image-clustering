@@ -18,7 +18,7 @@ public:
     Vec3(cv::Vec3b vector) : x(static_cast<float>(vector[0])), y(static_cast<float>(vector[1])), z(static_cast<float>(vector[2])) {
     }
 
-    float operator[](int i){
+    float operator[](int i) const {
         switch (i){
             case 0:
                 return x;
@@ -31,36 +31,40 @@ public:
         }
     }
 
-    Vec3 operator+(const Vec3 &v) {
+    Vec3 operator+(const Vec3 &v) const {
         return Vec3(x + v.x, y + v.y, z + v.z);
     }
 
-    void operator+=(const Vec3 &v) {
+    Vec3& operator+=(const Vec3 &v) {
         (*this) = Vec3(x + v.x, y + v.y, z + v.z);
+        return *this;
     }
 
-    Vec3 operator-(const Vec3 &v) {
+    Vec3 operator-(const Vec3 &v) const {
         return Vec3(x - v.x, y - v.y, z - v.z);
     }
 
-    void operator-=(const Vec3 &v) {
+    Vec3& operator-=(const Vec3 &v) {
         (*this) = Vec3(x - v.x, y - v.y, z - v.z);
+        return *this;
     }
 
-    Vec3 operator*(const float &c) {
+    Vec3 operator*(const float &c) const {
         return Vec3(x * c, y * c, z * c);
     }
 
-    void operator*=(const float &c) {
+    Vec3& operator*=(const float &c) {
         (*this) = Vec3(x * c, y * c, z * c);
+        return *this;
     }
     
-    Vec3 operator/(const float &c) {
+    Vec3 operator/(const float &c) const {
         return Vec3(x / c, y / c, z / c);
     }
 
-    void operator/=(const float &c) {
+    Vec3& operator/=(const float &c) {
         (*this) = Vec3(x / c, y / c, z / c);
+        return *this;
     }
 
     float length() const {
@@ -150,13 +154,16 @@ int main(int argc, char *argv[]) {
 
     point1.print();
 
-    point1 = point1.normalize();
+    point1.normalize().normalize();
 
     point1.print();
 
     std::cout << point1.length() << std::endl;
 
     std::cout << point1[0] << std::endl;
+
+    ((point1 += point2) - point2).print();
+    point1.print(); 
 
     cv::imshow("image", image -> getImage());
     cv::waitKey(0);
