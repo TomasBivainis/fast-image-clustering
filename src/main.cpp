@@ -81,6 +81,10 @@ public:
         return *this;
     }
 
+    cv::Vec3b convertToVec3b() {
+        return cv::Vec3b({static_cast<uchar>(x), static_cast<uchar>(y), static_cast<u_char>(z)});
+    }
+
     void print() {
         std::cout << x << " " << y << " " << z << std::endl;
     }
@@ -88,39 +92,59 @@ public:
 
 class Image {
 private:
-    int width;
-    int height;
-    cv::Mat image;
+    int rows;
+    int columns;
+    // cv::Mat image;
+    std::vector<std::vector<Vec3>> image;
 public:
-    Image(std::string filename) {
-       image = cv::imread(filename, cv::IMREAD_COLOR_BGR); 
+    // Image(std::string filename) {
+    //    image = cv::imread(filename, cv::IMREAD_COLOR_BGR); 
 
-        if(image.empty()) throw new std::runtime_error("No image found");
+    //     if(image.empty()) throw new std::runtime_error("No image found");
 
-        width = image.size().width;
-        height = image.size().height;
-    }
+    //     width = image.size().width;
+    //     height = image.size().height;
+    // }
 
     Image(cv::Mat image) {
-        this -> image = image;
-        width = image.size().width;
-        height = image.size().height;
+        this -> rows = image.rows;
+        this -> columns = image.cols;
+
+        (this -> image) = std::vector<std::vector<Vec3>>(rows, std::vector<Vec3>(columns));
+
+        for(int i = 0; i < image.rows; i++) {
+            for(int j = 0; j < image.cols; j++) {
+                this -> image[i][j] = Vec3(image.at<cv::Vec3b>(i, j));
+            }
+        }
     }
 
-    int getWidth() {
-        return width;
+    int getRows() {
+        return rows;
     }
 
-    int getHeight() {
-        return height;
+    int getColumns() {
+        return columns;
     }
 
-    cv::Mat getImage() {
+    std::vector<std::vector<Vec3>>& getImage() {
         return image;
     }
 
     Vec3 getPoint(int row, int column) {
-        return Vec3(image.at<cv::Vec3b>(row, column));
+        return image[row][column];
+    }
+
+    cv::Mat* convertToMat() {
+        cv::Mat* converted_image = new cv::Mat(cv::Size(columns, rows), CV_8UC3);
+
+        for(int i = 0; i < rows; i++) {
+            for(int j = 0; j < columns; j++) {
+                converted_image -> at<cv::Vec3b>(i, j) = this -> image[i][j].convertToVec3b();
+            }
+        }
+        
+        return converted_image;
     }
 };
 
@@ -134,7 +158,9 @@ int main(int argc, char *argv[]) {
     
     char *filename = argv[1];
 
-    Image *image = new Image(filename);
+    cv::Mat opencv_image = cv::imread(filename);
+
+    Image *image = new Image(opencv_image);
 
     Vec3 point1 = image -> getPoint(0, 0);
     Vec3 point2 = image -> getPoint(0, 1);
@@ -165,7 +191,7 @@ int main(int argc, char *argv[]) {
     ((point1 += point2) - point2).print();
     point1.print(); 
 
-    cv::imshow("image", image -> getImage());
+    cv::imshow("image", *image -> convertToMat());
     cv::waitKey(0);
 
     return 0;
