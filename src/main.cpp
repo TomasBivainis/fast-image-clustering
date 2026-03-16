@@ -154,16 +154,16 @@ public:
 
 class Centroid {
 private:
-    std::vector<Vec3*> points;
+    std::vector<Vec3> points;
     Vec3 centroid;
 public:
-    Centroid() : points(std::vector<Vec3*>()), centroid(Vec3(0, 0, 0)) {
+    Centroid() : points(std::vector<Vec3>()), centroid(Vec3(0, 0, 0)) {
     }
 
-    Centroid(Vec3 centroid) : centroid(centroid), points(std::vector<Vec3*>()){
+    Centroid(Vec3 centroid) : centroid(centroid), points(std::vector<Vec3>()){
     }
 
-    void addPoint(Vec3* point) {
+    void addPoint(Vec3 point) {
         points.push_back(point);
     }
 
@@ -175,7 +175,7 @@ public:
         centroid = Vec3(0, 0, 0);
 
         for(int i = 0; i < points.size(); i++) {
-            centroid += *points[i];
+            centroid += points[i];
         }
 
         centroid /= static_cast<float>(points.size());
@@ -190,7 +190,30 @@ public:
     }
 };
 
+void train(Image* image, std::vector<Centroid*>& const centroids) {
+    for(int i = 0; i < (*image).getRows(); i++) {
+        for(int j = 0; j < (*image).getColumns(); j++) {
+            Vec3 currentPoint = (*image).getPoint(i, j);
+            Centroid* currentCentroid = centroids[0];
+            float smallestDistance = (*currentCentroid).distance(currentPoint);
 
+            for(int k = 1; k < centroids.size(); k++) {
+                float temp = (*centroids[k]).distance(currentPoint);
+                if(temp < smallestDistance) {
+                    currentCentroid = centroids[k];
+                    smallestDistance = temp;
+                }
+            }
+
+            (*currentCentroid).addPoint(currentPoint);
+        }
+    }
+
+    for(int k = 0; k < centroids.size(); k++) {
+        (*centroids[k]).calculateCentroid();
+        (*centroids[k]).clearPoints();
+    }
+}
 
 int main(int argc, char *argv[]) {
     if(argc < 2) {
