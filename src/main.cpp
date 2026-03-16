@@ -88,6 +88,10 @@ public:
     void print() {
         std::cout << x << " " << y << " " << z << std::endl;
     }
+
+    float dot(Vec3 v) {
+        return x * v[0] + y * v[1] + z * v[2];
+    }
 };
 
 class Image {
@@ -147,6 +151,46 @@ public:
         return converted_image;
     }
 };
+
+class Centroid {
+private:
+    std::vector<Vec3*> points;
+    Vec3 centroid;
+public:
+    Centroid() : points(std::vector<Vec3*>()), centroid(Vec3(0, 0, 0)) {
+    }
+
+    Centroid(Vec3 centroid) : centroid(centroid), points(std::vector<Vec3*>()){
+    }
+
+    void addPoint(Vec3* point) {
+        points.push_back(point);
+    }
+
+    void setCentroid(Vec3 centroid) {
+        this -> centroid = centroid;
+    }
+
+    void calculateCentroid() {
+        centroid = Vec3(0, 0, 0);
+
+        for(int i = 0; i < points.size(); i++) {
+            centroid += *points[i];
+        }
+
+        centroid /= static_cast<float>(points.size());
+    }
+
+    void clearPoints() {
+        points.clear();
+    }
+
+    float distance(Vec3 point) {
+        return std::sqrtf(std::powf(centroid.dot(point), 2));
+    }
+};
+
+
 
 int main(int argc, char *argv[]) {
     if(argc < 2) {
