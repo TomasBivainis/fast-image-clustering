@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
+#include <stdlib.h>
 #include <opencv2/opencv.hpp>
 
 class Vec3 {
@@ -178,7 +179,7 @@ public:
             centroid += points[i];
         }
 
-        centroid /= static_cast<float>(points.size());
+        if(points.size() > 0) centroid /= static_cast<float>(points.size());
     }
 
     void clearPoints() {
@@ -186,11 +187,19 @@ public:
     }
 
     float distance(Vec3 point) {
-        return std::sqrtf(std::powf(centroid.dot(point), 2));
+        return std::sqrtf((centroid - point).dot(centroid - point));
+    }
+
+    Vec3 getCentroid() {
+        return centroid;
     }
 };
 
-void train(Image* image, std::vector<Centroid*>& const centroids) {
+void train(Image* image, std::vector<Centroid*>& centroids) {
+    for(int k = 0; k < centroids.size(); k++) {
+        (*centroids[k]).clearPoints();
+    }
+
     for(int i = 0; i < (*image).getRows(); i++) {
         for(int j = 0; j < (*image).getColumns(); j++) {
             Vec3 currentPoint = (*image).getPoint(i, j);
@@ -199,6 +208,7 @@ void train(Image* image, std::vector<Centroid*>& const centroids) {
 
             for(int k = 1; k < centroids.size(); k++) {
                 float temp = (*centroids[k]).distance(currentPoint);
+
                 if(temp < smallestDistance) {
                     currentCentroid = centroids[k];
                     smallestDistance = temp;
@@ -211,7 +221,14 @@ void train(Image* image, std::vector<Centroid*>& const centroids) {
 
     for(int k = 0; k < centroids.size(); k++) {
         (*centroids[k]).calculateCentroid();
-        (*centroids[k]).clearPoints();
+    }
+}
+
+void initializeCentroidList(std::vector<Centroid*>& centroids, int k, Image* image) {
+    std::srand(time(0));
+
+    for(int i = 0; i < k; i++) {
+        centroids.push_back(new Centroid(image -> getPoint(rand() % image -> getRows(), rand() / image -> getColumns())));
     }
 }
 
@@ -258,8 +275,32 @@ int main(int argc, char *argv[]) {
     ((point1 += point2) - point2).print();
     point1.print(); 
 
+    std::vector<Centroid*> centroids;
+
+    initializeCentroidList(centroids, 3, image);
+
+    // centroids[1] -> getCentroid().print();
+    // image ->getPoint(0, 0).print();
+    // std::cout << centroids[1] -> distance(image -> getPoint(0, 0)) << std::endl;
+    // centroids[1] -> getCentroid().print();
+    // image ->getPoint(50, 0).print();
+    // std::cout << centroids[1] -> distance(image -> getPoint(50, 0)) << std::endl;
+        
+    for(int i = 0; i < 3; i++) {
+        train(image, centroids);
+    }
+
+    for(int i = 0; i < centroids.size(); i++) {
+        (*centroids[i]).getCentroid().print();
+    }
+
     cv::imshow("image", *image -> convertToMat());
     cv::waitKey(0);
+
+    free(image);
+    for(int k = 0; k < centroids.size(); k++) {
+        free(centroids[k]);
+    }
 
     return 0;
 }
