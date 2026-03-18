@@ -271,51 +271,18 @@ int main(int argc, char *argv[]) {
 
     Image *image = new Image(opencv_image);
 
-    Vec3 point1 = image -> getPoint(0, 0);
-    Vec3 point2 = image -> getPoint(0, 1);
-
-    point1.print();
-    point2.print();
-
-    point1 += point2;
-    
-    point1.print();
-
-    point1 = point1 - point2;
-
-    point1.print();
-
-    point1 = point1 * 10;
-
-    point1.print();
-
-    point1.normalize().normalize();
-
-    point1.print();
-
-    std::cout << point1.length() << std::endl;
-
-    std::cout << point1[0] << std::endl;
-
-    ((point1 += point2) - point2).print();
-    point1.print(); 
-
     std::vector<Centroid*> centroids;
 
     initializeCentroidList(centroids, 3, image);
        
     for(int i = 0; i < 3; i++) {
-        std::cout << "train " << i << std::endl;
         train(image, centroids);
     }
-
-    std::cout << "trained" << std::endl;
 
     for(int i = 0; i < centroids.size(); i++) {
         (*centroids[i]).getCentroid().print();
     }
 
-    std::cout << "Paining" << std::endl;
     repaintImage(image, centroids);
 
     cv::imshow("image", *image -> convertToMat());
