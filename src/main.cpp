@@ -151,6 +151,10 @@ public:
         
         return converted_image;
     }
+
+    void setPoint(int row, int column, Vec3 newColor) {
+        this -> image[row][column] = newColor;
+    }
 };
 
 class Centroid {
@@ -186,7 +190,7 @@ public:
         points.clear();
     }
 
-    float distance(Vec3 point) {
+    float distance(const Vec3 &point) {
         return std::sqrtf((centroid - point).dot(centroid - point));
     }
 
@@ -229,6 +233,27 @@ void initializeCentroidList(std::vector<Centroid*>& centroids, int k, Image* ima
 
     for(int i = 0; i < k; i++) {
         centroids.push_back(new Centroid(image -> getPoint(rand() % image -> getRows(), rand() / image -> getColumns())));
+    }
+}
+
+void repaintImage(Image* image, std::vector<Centroid*>& centroids) {
+    for(int i = 0; i < (*image).getRows(); i++) {
+        for(int j = 0; j < (*image).getColumns(); j++) {
+            Vec3 currentPoint = (*image).getPoint(i, j);
+            Centroid* currentCentroid = centroids[0];
+            float smallestDistance = (*currentCentroid).distance(currentPoint);
+
+            for(int k = 1; k < centroids.size(); k++) {
+                float temp = (*centroids[k]).distance(currentPoint);
+
+                if(temp < smallestDistance) {
+                    currentCentroid = centroids[k];
+                    smallestDistance = temp;
+                }
+            }
+
+            image -> setPoint(i, j, currentCentroid -> getCentroid());
+        }
     }
 }
 
@@ -278,21 +303,20 @@ int main(int argc, char *argv[]) {
     std::vector<Centroid*> centroids;
 
     initializeCentroidList(centroids, 3, image);
-
-    // centroids[1] -> getCentroid().print();
-    // image ->getPoint(0, 0).print();
-    // std::cout << centroids[1] -> distance(image -> getPoint(0, 0)) << std::endl;
-    // centroids[1] -> getCentroid().print();
-    // image ->getPoint(50, 0).print();
-    // std::cout << centroids[1] -> distance(image -> getPoint(50, 0)) << std::endl;
-        
+       
     for(int i = 0; i < 3; i++) {
+        std::cout << "train " << i << std::endl;
         train(image, centroids);
     }
+
+    std::cout << "trained" << std::endl;
 
     for(int i = 0; i < centroids.size(); i++) {
         (*centroids[i]).getCentroid().print();
     }
+
+    std::cout << "Paining" << std::endl;
+    repaintImage(image, centroids);
 
     cv::imshow("image", *image -> convertToMat());
     cv::waitKey(0);
