@@ -232,7 +232,7 @@ void initializeCentroidList(std::vector<Centroid*>& centroids, int k, Image* ima
     std::srand(time(0));
 
     for(int i = 0; i < k; i++) {
-        centroids.push_back(new Centroid(image -> getPoint(rand() % image -> getRows(), rand() / image -> getColumns())));
+        centroids.push_back(new Centroid(image -> getPoint(rand() % image -> getRows(), rand() % image -> getColumns())));
     }
 }
 
@@ -257,6 +257,26 @@ void repaintImage(Image* image, std::vector<Centroid*>& centroids) {
     }
 }
 
+void cluster_image(Image* image, int k, int epochs) {
+    std::vector<Centroid*> centroids;
+
+    initializeCentroidList(centroids, k, image);
+       
+    for(int i = 0; i < epochs; i++) {
+        train(image, centroids);
+    }
+
+    // for(int i = 0; i < centroids.size(); i++) {
+    //     (*centroids[i]).getCentroid().print();
+    // }
+
+    repaintImage(image, centroids);
+
+    for(int k = 0; k < centroids.size(); k++) {
+        free(centroids[k]);
+    }
+}
+
 int main(int argc, char *argv[]) {
     if(argc < 2) {
         std::cout << "Not enough arguments" << std::endl;
@@ -271,27 +291,12 @@ int main(int argc, char *argv[]) {
 
     Image *image = new Image(opencv_image);
 
-    std::vector<Centroid*> centroids;
-
-    initializeCentroidList(centroids, 3, image);
-       
-    for(int i = 0; i < 3; i++) {
-        train(image, centroids);
-    }
-
-    for(int i = 0; i < centroids.size(); i++) {
-        (*centroids[i]).getCentroid().print();
-    }
-
-    repaintImage(image, centroids);
+    cluster_image(image, 8, 3);
 
     cv::imshow("image", *image -> convertToMat());
     cv::waitKey(0);
 
-    free(image);
-    for(int k = 0; k < centroids.size(); k++) {
-        free(centroids[k]);
-    }
+    free(image); 
 
     return 0;
 }
