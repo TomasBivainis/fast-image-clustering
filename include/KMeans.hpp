@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include "Vec3.hpp"
+#include "Centroid.hpp"
+#include "Image.hpp"
 
 namespace KMeans {
     void train(Image* image, std::vector<Centroid*>& centroids); 

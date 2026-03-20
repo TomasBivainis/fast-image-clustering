@@ -29,7 +29,7 @@ Vec3 Image::getPoint(int row, int column) {
     return image[row][column];
 }
 
-cv::Mat* Image:convertToMat() {
+cv::Mat* Image::convertToMat() {
     cv::Mat* converted_image = new cv::Mat(cv::Size(columns, rows), CV_8UC3);
 
     for(int i = 0; i < rows; i++) {
