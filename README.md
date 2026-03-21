@@ -5,7 +5,6 @@
 # TODO
 
 - Add progress bar
-- Add testing
+- Add test cases
 - Add errors to classes
 - Add flags and arguments
-- Split the code into multiple files

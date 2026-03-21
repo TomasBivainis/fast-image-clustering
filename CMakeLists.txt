@@ -27,3 +27,12 @@ target_link_libraries(KMeansLib PUBLIC ${OpenCV_LIBS})
 
 add_executable(KMeansApp ./src/main.cpp)
 target_link_libraries(KMeansApp PRIVATE KMeansLib)
+
+enable_testing()
+add_executable(unit_tests tests/test_main.cpp)
+
+target_link_libraries(unit_tests PRIVATE KMeansLib Catch2::Catch2WithMain)
+
+include(CTest)
+include(Catch)
+catch_discover_tests(unit_tests)
